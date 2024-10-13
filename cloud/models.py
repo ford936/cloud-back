@@ -1,6 +1,11 @@
+import os.path
+
 from django.db import models
-from django.contrib.auth.models import AbstractUser, User
-PATH = ''
+from django.contrib.auth.models import AbstractUser
+
+
+def change_file_path(instance, filename):
+    return os.path.join('cloud', instance.created_by.username, filename)
 
 
 class User(AbstractUser):
@@ -8,7 +13,7 @@ class User(AbstractUser):
 
 
 class File(models.Model):
-    file = models.FileField(upload_to=f'static/{PATH}')
+    file = models.FileField(upload_to=change_file_path)
     name = models.CharField(max_length=100)
     description = models.TextField()
     size = models.FloatField()

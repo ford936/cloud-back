@@ -1,14 +1,23 @@
 from rest_framework import serializers
+
 from cloud.models import User, File
 
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=128, write_only=True)
+    user_cloud_path = serializers.CharField(max_length=200, read_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'email', 'password', 'is_staff', 'user_path']
+        fields = ['id', 'username', 'first_name', 'password', 'email', 'is_staff', 'user_cloud_path']
 
 
 class FileSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=100, read_only=True)
+    size = serializers.FloatField(read_only=True)
+    last_load_date = serializers.DateTimeField(read_only=True)
+    created_by = UserSerializer(read_only=True)
+
     class Meta:
         model = File
         fields = ['id', 'file', 'name', 'description', 'size', 'unload_date', 'last_load_date', 'created_by']
