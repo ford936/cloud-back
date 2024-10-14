@@ -1,13 +1,16 @@
+import os
+from pathlib import Path
 
-from rest_framework import viewsets, status
+from django.http import HttpResponse, FileResponse
+from rest_framework import viewsets, status, permissions
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+import hashlib
 
-from cloud.serializers import UserSerializer, FileSerializer
-
+from cloud.serializers import UserSerializer, FileSerializer, FileRetrieveSerializer
 from .models import User, File
 from transliterate import translit
 from rest_framework.permissions import BasePermission, IsAuthenticated
-
 
 
 class IsPostForCreateUser(BasePermission):
@@ -62,6 +65,33 @@ class FileViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class = FileRetrieveSerializer
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        self.serializer_class = FileRetrieveSerializer
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        if instance.name != request.data['name']:
+            old_path = instance.file.path
+            instance.file.name = f"cloud/{instance.created_by.username}/{request.data['name']}"
+            instance.save()
+            new_path = instance.file.path
+            os.rename(old_path, new_path)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -74,3 +104,18 @@ class FileViewSet(viewsets.ModelViewSet):
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_or_create_anonym_link(request, id):
+    try:
+        file = File.objects.get(id=id)
+        if not file.anonym_link:
+            h = hashlib.md5(file.name.encode())
+            p = h.hexdigest()
+            file.anonym_link = p
+            file.save()
+        return Response({'link': file.anonym_link})
+    except:
+        return Response({'error': 'bad file id'}, status=status.HTTP_404_NOT_FOUND)

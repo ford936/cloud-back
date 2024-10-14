@@ -17,7 +17,22 @@ class FileSerializer(serializers.ModelSerializer):
     size = serializers.FloatField(read_only=True)
     last_load_date = serializers.DateTimeField(read_only=True)
     created_by = UserSerializer(read_only=True)
+    anonym_link = serializers.CharField(read_only=True)
 
     class Meta:
         model = File
-        fields = ['id', 'file', 'name', 'description', 'size', 'unload_date', 'last_load_date', 'created_by']
+        fields = ['id', 'file', 'name', 'description', 'size', 'unload_date', 'last_load_date', 'created_by',
+                  'anonym_link']
+
+
+class FileRetrieveSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=100)
+    size = serializers.FloatField(read_only=True)
+    last_load_date = serializers.DateTimeField(read_only=True)
+    created_by = UserSerializer(read_only=True)
+    file = serializers.FileField(read_only=True)
+
+    class Meta:
+        model = File
+        fields = ['id', 'file', 'name', 'description', 'size', 'unload_date', 'last_load_date', 'created_by',
+                  'anonym_link']
