@@ -21,21 +21,35 @@ class IsPostForCreateUser(BasePermission):
             return False
 
 
+class IsUseAnonLInk(BasePermission):
+    def has_permission(self, request, view):
+        return True
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsPostForCreateUser, ]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.validated_data['user_cloud_path'] = f'static/{serializer.validated_data["username"]}/'
-        self.perform_create(serializer)
-        user = User.objects.get(id=serializer.data['id'])
-        user.set_password(user.password)
-        user.save()
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        import re
+
+        valid_email = re.search(r'^[\w\.-]+@[\w\.-]+\.\w+$', request.data['email'])
+        valid_username = re.search(r'^[a-zA-Z][a-zA-Z0-9]{3,19}$', request.data['username'])
+        valid_password = re.search(r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.])[A-Za-z\d@$!%*?&.]{6,}$', request.data['password'])
+
+        if valid_email and valid_username and valid_password:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.validated_data['user_cloud_path'] = f'static/{serializer.validated_data["username"]}/'
+            self.perform_create(serializer)
+            user = User.objects.get(id=serializer.data['id'])
+            user.set_password(user.password)
+            user.save()
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        else:
+            return Response({'error': 'not valid '}, status=status.HTTP_404_NOT_FOUND)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset()) if request.user.is_superuser else User.objects.filter(
