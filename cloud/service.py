@@ -20,14 +20,10 @@ from cloud.views import IsUseAnonLInk
 @permission_classes([IsUseAnonLInk])
 def custom_serve(request, path: str, document_root=None, show_indexes=False):
     if File.objects.filter(anonym_link=path.split('/')[1]).exists():
-        file = File.objects.get(anonym_link=path.split('/')[1]) # 'cloud/admin/Zlobin_Maksim.pdf'
+        file = File.objects.get(anonym_link=path.split('/')[1])
         i = file
         path = file.file.name
-    # elif request.user.is_anonymous:
-    #     return HttpResponse({'error: 403'}, status=status.HTTP_403_FORBIDDEN)
     user = path.split('/')[1]
-    # if user != request.user.username:
-    #     return HttpResponse({'error: 403'}, status=status.HTTP_403_FORBIDDEN)
     path = posixpath.normpath(path).lstrip("/")
     fullpath = Path(safe_join(document_root, path))
     if fullpath.is_dir():
