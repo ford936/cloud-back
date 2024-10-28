@@ -19,7 +19,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', '193.227.241.173']
 
 # Application definition
 
@@ -91,13 +91,14 @@ AUTH_USER_MODEL = 'cloud.User'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",
+    'http://193.227.241.173'
 ]
 
 # for coockie send on https
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://193.227.241.173']
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
