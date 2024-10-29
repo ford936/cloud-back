@@ -6,10 +6,8 @@ from django.http import HttpResponse, Http404, HttpResponseNotModified, FileResp
 from django.utils._os import safe_join
 from django.utils.http import http_date
 from django.views.static import directory_index, was_modified_since
-# from pkg_resources import _
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework import permissions
 from rest_framework.response import Response
 
 from cloud.models import File

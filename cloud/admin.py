@@ -12,3 +12,4 @@ class FilesAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     fields = ('username', 'first_name', 'email', 'password', 'is_staff', 'user_cloud_path')
     list_display = ['id', 'username', 'first_name', 'email', 'password', 'is_staff', 'user_cloud_path']
+
