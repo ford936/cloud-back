@@ -107,11 +107,11 @@ CSRF_TRUSTED_ORIGINS = ['http://91.197.96.231']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'NAME': 'back',
+        'USER': 'back',
+        'PASSWORD': '1234',
+        'HOST': '91.197.96.231',
+        'PORT': '5432',
     }
 }
 
