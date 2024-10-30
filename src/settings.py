@@ -91,8 +91,8 @@ AUTH_USER_MODEL = 'cloud.User'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",
-    'http://91.197.96.231:5173'
-    'http://91.197.96.231:8025'
+    'http://91.197.96.231:5173',
+    'http://91.197.96.231:8025',
 ]
 
 # for coockie send on https
